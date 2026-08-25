@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShopGenie | AI-Powered Shopping</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <!-- External CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Ambient Glow Background -->
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+    <!-- Navbar / Header -->
+    <header class="navbar">
+      <div class="logo">
+        <span class="logo-icon">✦</span>
+        <span class="logo-text">ShopGenie</span>
+      </div>
+      <div class="status-badge">
+        <span class="pulse-dot"></span>
+        <span>AI Assistant Online</span>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="pill-badge">✨ Smarter shopping. Better choices.</div>
+      <h1 class="hero-title">Shopping, <span>but smarter.</span></h1>
+      <p class="hero-subtitle">
+        Tell ShopGenie what you need. Our AI analyzes your requirements and finds products that actually match your needs.
+      </p>
+
+      <div class="features-pill-row">
+        <div class="feature-chip">
+          <span class="chip-icon">🧠</span> AI Recommendations
+        </div>
+        <div class="feature-chip">
+          <span class="chip-icon">⚡</span> Fast Comparison
+        </div>
+        <div class="feature-chip">
+          <span class="chip-icon">🎯</span> Personalized Matches
+        </div>
+      </div>
+    </section>
+
+    <!-- Search / Prompt Form Card -->
+    <section class="search-card">
+      <div class="card-header">
+        <div class="badge-mini">✦ AI-POWERED</div>
+        <h2>What are you looking for?</h2>
+        <p>Describe your ideal product in your own words.</p>
+      </div>
+
+      <form id="shopForm">
+        <div class="form-group">
+          <label for="prompt">Describe Your Need</label>
+          <div class="input-wrapper">
+            <textarea 
+              id="prompt" 
+              rows="3" 
+              placeholder="Example: I need a lightweight laptop for coding with at least 16GB RAM and great battery life..."
+            ></textarea>
+          </div>
+          <span class="input-tip">💡 <strong>Tip:</strong> Include your budget, use case, and important features.</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="category">Category</label>
+            <div class="select-wrapper">
+              <select id="category">
+                <option value="any">📦 Any Category</option>
+                <option value="laptops">💻 Laptops & Computers</option>
+                <option value="smartphones">📱 Smartphones</option>
+                <option value="audio">🎧 Audio & Headphones</option>
+                <option value="wearables">⌚ Wearables & Smartwatches</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="budget">Maximum Budget</label>
+            <div class="currency-input">
+              <span class="currency-symbol">₹</span>
+              <input type="text" id="budget" value="70,000" placeholder="e.g. 50,000" />
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="btn-primary">
+          <span>Find My Best Match</span>
+          <span class="arrow">→</span>
+        </button>
+
+        <div class="trust-footer">
+          <span>🔒 No complicated filters</span>
+          <span class="dot">•</span>
+          <span>🤖 AI-powered recommendations</span>
+          <span class="dot">•</span>
+          <span>⚡ Fast results</span>
+        </div>
+      </form>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="steps-section">
+      <div class="section-title">
+        <div class="pill-badge">HOW SHOPGENIE WORKS</div>
+        <h2>From search to decision in seconds.</h2>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">01</span>
+            <span class="step-emoji">💬</span>
+          </div>
+          <h3>Tell us what you need</h3>
+          <p>Describe your requirements naturally, just like you're talking to a friend.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">02</span>
+            <span class="step-emoji">🧠</span>
+          </div>
+          <h3>AI analyzes your needs</h3>
+          <p>ShopGenie understands your budget, preferences, and key priorities in real-time.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-header">
+            <span class="step-num">03</span>
+            <span class="step-emoji">🎯</span>
+          </div>
+          <h3>Get your best matches</h3>
+          <p>Receive recommendations ranked strictly according to what matters most to you.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>© 2026 ShopGenie. AI-Powered Agentic Commerce.</p>
+    </footer>
+  </div>
+
+</body>
+</html>
