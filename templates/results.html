@@ -1,45 +1,613 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>
-        ShopGenie | Your Recommendations
-    </title>
+    <title>ShopGenie | Recommended Products</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
 
-    <link
-        rel="preconnect"
-        href="https://fonts.googleapis.com"
-    >
+    <style>
 
-    <link
-        rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin
-    >
+        /* =====================================================
+           RESET
+        ===================================================== */
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
 
-    <!-- CSS -->
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background:
+                radial-gradient(
+                    circle at top left,
+                    rgba(120, 80, 255, 0.20),
+                    transparent 35%
+                ),
+                radial-gradient(
+                    circle at top right,
+                    rgba(0, 200, 255, 0.12),
+                    transparent 30%
+                ),
+                #080810;
 
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .header {
+            width: 100%;
+            padding: 22px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+
+            background: rgba(8,8,16,0.85);
+            backdrop-filter: blur(15px);
+
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+
+        .header p {
+            font-size: 13px;
+            color: #a9a9b8;
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .container {
+            width: min(1250px, 92%);
+            margin: 0 auto;
+            padding: 55px 0 70px;
+        }
+
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+
+        .page-title h1 {
+            font-size: clamp(30px, 4vw, 48px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+
+            background: linear-gradient(
+                90deg,
+                #ffffff,
+                #b9a7ff
+            );
+
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+
+        .subtitle {
+            text-align: center;
+            color: #a5a5b5;
+            font-size: 15px;
+            margin-bottom: 45px;
+        }
+
+
+        /* =====================================================
+           PRODUCT GRID
+        ===================================================== */
+
+        .product-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 24px;
+
+            align-items: stretch;
+        }
+
+
+        /* =====================================================
+           PRODUCT CARD
+        ===================================================== */
+
+        .product-card {
+            background: rgba(20,20,32,0.88);
+
+            border: 1px solid rgba(255,255,255,0.10);
+
+            border-radius: 22px;
+
+            overflow: hidden;
+
+            display: flex;
+            flex-direction: column;
+
+            min-width: 0;
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,0.25);
+
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+
+        .product-card:hover {
+            transform: translateY(-6px);
+
+            border-color:
+                rgba(145, 110, 255, 0.55);
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,0.40);
+        }
+
+
+        /* =====================================================
+           PRODUCT IMAGE
+        ===================================================== */
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+
+            background: #11111c;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            overflow: hidden;
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.07);
+        }
+
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: contain;
+
+            display: block;
+
+            padding: 18px;
+
+            transition: transform 0.3s ease;
+        }
+
+
+        .product-card:hover .product-image img {
+            transform: scale(1.04);
+        }
+
+
+        .no-image {
+            font-size: 60px;
+            opacity: 0.5;
+        }
+
+
+        /* =====================================================
+           PRODUCT INFO
+        ===================================================== */
+
+        .product-info {
+            padding: 24px;
+
+            display: flex;
+            flex-direction: column;
+
+            flex: 1;
+        }
+
+
+        .product-info h2 {
+            font-size: 19px;
+            line-height: 1.4;
+
+            font-weight: 700;
+
+            margin-bottom: 10px;
+
+            color: #ffffff;
+        }
+
+
+        /* =====================================================
+           PRICE
+        ===================================================== */
+
+        .price {
+            font-size: 24px;
+
+            font-weight: 800;
+
+            color: #bca8ff;
+
+            margin-bottom: 14px;
+        }
+
+
+        /* =====================================================
+           DESCRIPTION
+        ===================================================== */
+
+        .description {
+            color: #aaaabb;
+
+            font-size: 13px;
+
+            line-height: 1.65;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* =====================================================
+           MATCH SECTION
+        ===================================================== */
+
+        .match-section {
+            margin-bottom: 20px;
+        }
+
+
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            margin-bottom: 8px;
+        }
+
+
+        .match-bar {
+            width: 100%;
+
+            height: 8px;
+
+            background: #292938;
+
+            border-radius: 20px;
+
+            overflow: hidden;
+        }
+
+
+        .match-progress {
+            height: 100%;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    #7755ff,
+                    #b69aff
+                );
+
+            width: 0;
+
+            transition: width 0.6s ease;
+        }
+
+
+        /* =====================================================
+           WHY BOX
+        ===================================================== */
+
+        .why-box {
+            background:
+                rgba(120, 90, 255, 0.08);
+
+            border:
+                1px solid rgba(140,110,255,0.20);
+
+            border-radius: 14px;
+
+            padding: 15px;
+
+            margin-top: auto;
+
+            margin-bottom: 20px;
+        }
+
+
+        .why-box strong {
+            display: block;
+
+            font-size: 12px;
+
+            color: #c9baff;
+
+            margin-bottom: 7px;
+        }
+
+
+        .why-box p {
+            font-size: 12px;
+
+            line-height: 1.6;
+
+            color: #b5b5c4;
+        }
+
+
+        /* =====================================================
+           VIEW PRODUCT BUTTON
+        ===================================================== */
+
+        .view-product-btn {
+            width: 100%;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 13px 18px;
+
+            border-radius: 12px;
+
+            text-decoration: none;
+
+            color: #ffffff;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #7555ff,
+                    #9678ff
+                );
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+
+        .view-product-btn:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 30px rgba(117,85,255,0.30);
+        }
+
+
+        /* =====================================================
+           BACK BUTTON
+        ===================================================== */
+
+        .back-container {
+            text-align: center;
+
+            margin-top: 40px;
+        }
+
+
+        .back-btn {
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 12px 22px;
+
+            border-radius: 12px;
+
+            border:
+                1px solid rgba(255,255,255,0.12);
+
+            background:
+                rgba(255,255,255,0.04);
+
+            color: #ffffff;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 600;
+
+            transition: background 0.2s ease;
+        }
+
+
+        .back-btn:hover {
+            background:
+                rgba(255,255,255,0.09);
+        }
+
+
+        /* =====================================================
+           NO PRODUCTS
+        ===================================================== */
+
+        .no-products {
+            max-width: 600px;
+
+            margin: 70px auto;
+
+            text-align: center;
+
+            padding: 45px;
+
+            border-radius: 20px;
+
+            background:
+                rgba(255,255,255,0.04);
+
+            border:
+                1px solid rgba(255,255,255,0.10);
+        }
+
+
+        .no-products h2 {
+            margin-bottom: 12px;
+        }
+
+
+        .no-products p {
+            color: #aaaabb;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error-box {
+            max-width: 700px;
+
+            margin: 0 auto 30px;
+
+            padding: 15px 20px;
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,70,70,0.08);
+
+            border:
+                1px solid rgba(255,70,70,0.20);
+
+            color: #ffaaaa;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            text-align: center;
+
+            padding: 30px 20px;
+
+            color: #777788;
+
+            font-size: 12px;
+
+            border-top:
+                1px solid rgba(255,255,255,0.06);
+        }
+
+
+        /* =====================================================
+           TABLET
+        ===================================================== */
+
+        @media (max-width: 950px) {
+
+            .product-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 650px) {
+
+            .header {
+                padding: 18px 5%;
+
+                flex-direction: column;
+
+                gap: 5px;
+
+                align-items: flex-start;
+            }
+
+
+            .header p {
+                font-size: 11px;
+            }
+
+
+            .container {
+                width: 92%;
+
+                padding-top: 35px;
+            }
+
+
+            .product-grid {
+                grid-template-columns: 1fr;
+
+                gap: 20px;
+            }
+
+
+            .product-image {
+                height: 230px;
+            }
+
+
+            .product-info {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -47,213 +615,239 @@
 <body>
 
 
-<div class="ambient-glow"></div>
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
+    <header class="header">
 
-<div class="container">
-
-
-    <!-- ====================================================
-         NAVBAR
-    ===================================================== -->
-
-    <header class="navbar">
-
-
-        <a
-            href="/"
-            class="logo"
-        >
-
-            <span class="logo-icon">
-                ✦
-            </span>
-
-            <span class="logo-text">
-                ShopGenie
-            </span>
-
-        </a>
-
-
-        <div class="status-badge">
-
-            <span class="pulse-dot"></span>
-
-            AI Assistant Online
-
+        <div class="logo">
+            ✦ ShopGenie
         </div>
 
+        <p>
+            🤖 AI-Powered Product Recommendations
+        </p>
 
     </header>
 
 
 
-    <!-- ====================================================
-         HERO
-    ===================================================== -->
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
 
-    <section class="hero results-hero">
+    <main class="container">
 
 
-        <div class="pill-badge">
+        <div class="page-title">
 
-            ✨ AI RECOMMENDATIONS
+            <h1>
+                ✨ Recommended Products
+            </h1>
 
         </div>
 
 
-        <h1 class="hero-title">
+        <p class="subtitle">
 
-            Your
-            <span>Best Matches</span>
-
-        </h1>
-
-
-        <p class="hero-subtitle">
-
-            ShopGenie analyzed your requirements
-            and selected products that best match
-            your needs and budget.
+            ShopGenie found these products based on your requirements.
 
         </p>
 
 
-    </section>
-
-
-
-    <!-- ====================================================
-         SEARCH SUMMARY
-    ===================================================== -->
-
-    <section class="search-card">
-
-
-        <div class="card-header">
-
-
-            <div class="badge-mini">
-
-                ✦ YOUR SEARCH
-
-            </div>
-
-
-            <h2>
-
-                Your Requirements
-
-            </h2>
-
-
-            <p>
-
-                {{ prompt }}
-
-            </p>
-
-
-        </div>
-
-
-        <div class="form-grid">
-
-
-            <div class="feature-chip">
-
-                📦 Category:
-
-                <strong>
-
-                    {{ category }}
-
-                </strong>
-
-            </div>
-
-
-            <div class="feature-chip">
-
-                💰 Budget:
-
-                <strong>
-
-                    ₹{{ budget }}
-
-                </strong>
-
-            </div>
-
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- ====================================================
-         RECOMMENDATIONS
-    ===================================================== -->
-
-    <section class="steps-section">
-
-
-        <div class="section-title">
-
-
-            <div class="pill-badge">
-
-                TOP MATCHES
-
-            </div>
-
-
-            <h2>
-
-                Products selected for you
-
-            </h2>
-
-
-        </div>
-
-
-
-        {% if error %}
-
 
         <!-- ERROR -->
 
-        <div class="step-card error-card">
+        {% if error %}
+
+        <div class="error-box">
+
+            {{ error }}
+
+        </div>
+
+        {% endif %}
 
 
-            <div class="step-header">
 
-                <span class="step-emoji">
+        <!-- =================================================
+             PRODUCTS
+        ================================================== -->
 
-                    ⚠️
+        {% if products %}
 
-                </span>
-
-            </div>
-
-
-            <h3>
-
-                Unable to generate recommendations
-
-            </h3>
+        <div class="product-grid">
 
 
-            <p>
+            {% for product in products %}
 
-                {{ error }}
 
-            </p>
+            <article class="product-card">
 
+
+                <!-- PRODUCT IMAGE -->
+
+                <div class="product-image">
+
+                    {% if product.image %}
+
+                    <img
+                        src="{{ product.image }}"
+                        alt="{{ product.name }}"
+                        loading="lazy"
+                        onerror="this.onerror=null; this.src=''; this.parentElement.innerHTML='<div class=\'no-image\'>📦</div>';"
+                    >
+
+                    {% else %}
+
+                    <div class="no-image">
+                        📦
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+
+                <!-- PRODUCT INFORMATION -->
+
+                <div class="product-info">
+
+
+                    <!-- NAME -->
+
+                    <h2>
+                        {{ product.name }}
+                    </h2>
+
+
+
+                    <!-- PRICE -->
+
+                    {% if product.price %}
+
+                    <div class="price">
+
+                        {{ product.price }}
+
+                    </div>
+
+                    {% endif %}
+
+
+
+                    <!-- DESCRIPTION -->
+
+                    {% if product.description %}
+
+                    <p class="description">
+
+                        {{ product.description }}
+
+                    </p>
+
+                    {% endif %}
+
+
+
+                    <!-- MATCH -->
+
+                    {% if product.match is defined %}
+
+                    <div class="match-section">
+
+                        <div class="match-header">
+
+                            <span>
+                                🎯 Match Score
+                            </span>
+
+                            <span>
+                                {{ product.match }}%
+                            </span>
+
+                        </div>
+
+
+                        <div class="match-bar">
+
+                            <div
+                                class="match-progress"
+                                style="width: {{ product.match }}%;"
+                            >
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+
+                    <!-- WHY -->
+
+                    {% if product.why %}
+
+                    <div class="why-box">
+
+                        <strong>
+                            🤖 Why ShopGenie recommends this
+                        </strong>
+
+                        <p>
+                            {{ product.why }}
+                        </p>
+
+                    </div>
+
+                    {% endif %}
+
+
+
+                    <!-- VIEW PRODUCT -->
+
+                    {% if product.url %}
+
+                    <a
+                        href="{{ product.url }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="view-product-btn"
+                    >
+
+                        🛒 View Product
+
+                    </a>
+
+                    {% endif %}
+
+
+                </div>
+
+            </article>
+
+
+            {% endfor %}
+
+        </div>
+
+
+
+        <!-- BACK -->
+
+        <div class="back-container">
+
+            <a
+                href="/"
+                class="back-btn"
+            >
+
+                ← Search Again
+
+            </a>
 
         </div>
 
@@ -261,241 +855,28 @@
         {% else %}
 
 
-
         <!-- =================================================
-             PRODUCT GRID
+             NO PRODUCTS
         ================================================== -->
 
-        <div class="steps-grid">
+        <div class="no-products">
 
+            <h2>
+                😔 No products found
+            </h2>
 
-            {% for product in products %}
+            <p>
+                Try changing your requirements or increasing your budget.
+            </p>
 
+            <a
+                href="/"
+                class="back-btn"
+            >
 
-            <div class="step-card product-card">
+                ← Back to Search
 
-
-                <!-- ==========================================
-                     PRODUCT IMAGE
-                =========================================== -->
-
-
-                <div class="product-image-container">
-
-
-                    {% if product.image_urls %}
-
-
-                    <img
-                        src="{{ product.image_urls[0] }}"
-                        alt="{{ product.name }}"
-                        class="product-image"
-                        loading="eager"
-                        data-images='{{ product.image_urls | tojson }}'
-                        data-image-index="0"
-                    >
-
-
-                    {% else %}
-
-
-                    <div class="image-placeholder">
-
-                        <span>
-                            📦
-                        </span>
-
-                        <p>
-                            Product image unavailable
-                        </p>
-
-                    </div>
-
-
-                    {% endif %}
-
-
-                </div>
-
-
-
-                <!-- ==========================================
-                     NUMBER + ICON
-                =========================================== -->
-
-
-                <div class="step-header">
-
-
-                    <span class="step-num">
-
-                        0{{ loop.index }}
-
-                    </span>
-
-
-                    <span class="step-emoji">
-
-
-                        {% if loop.index == 1 %}
-
-                            🏆
-
-                        {% elif loop.index == 2 %}
-
-                            ⭐
-
-                        {% else %}
-
-                            🎯
-
-                        {% endif %}
-
-
-                    </span>
-
-
-                </div>
-
-
-
-                <!-- ==========================================
-                     PRODUCT NAME
-                =========================================== -->
-
-
-                <h3>
-
-                    {{ product.name }}
-
-                </h3>
-
-
-
-                <!-- ==========================================
-                     PRICE
-                =========================================== -->
-
-
-                <div class="product-price">
-
-                    {{ product.price }}
-
-                </div>
-
-
-
-                <!-- ==========================================
-                     DESCRIPTION
-                =========================================== -->
-
-
-                <p>
-
-                    {{ product.description }}
-
-                </p>
-
-
-
-                <!-- ==========================================
-                     MATCH SCORE
-                =========================================== -->
-
-
-                {% if product.match_score %}
-
-
-                <div class="match-score">
-
-
-                    <strong>
-
-                        {{ product.match_score }}% Match
-
-                    </strong>
-
-
-                    <div class="score-bar">
-
-
-                        <div
-                            class="score-fill"
-                            style="width: {{ product.match_score }}%;"
-                        >
-                        </div>
-
-
-                    </div>
-
-
-                </div>
-
-
-                {% endif %}
-
-
-
-                <!-- ==========================================
-                     WHY
-                =========================================== -->
-
-
-                {% if product.why %}
-
-
-                <div class="why-box">
-
-
-                    <strong>
-
-                        🤖 Why ShopGenie recommends this
-
-                    </strong>
-
-
-                    <p>
-
-                        {{ product.why }}
-
-                    </p>
-
-
-                </div>
-
-
-                {% endif %}
-
-
-
-                <!-- ==========================================
-                     PRODUCT LINK
-                =========================================== -->
-
-
-                {% if product.product_url %}
-
-
-                <a
-                    href="{{ product.product_url }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="view-product-btn"
-                >
-
-                    View Product →
-
-                </a>
-
-
-                {% endif %}
-
-
-            </div>
-
-
-            {% endfor %}
-
+            </a>
 
         </div>
 
@@ -503,181 +884,22 @@
         {% endif %}
 
 
-    </section>
+    </main>
 
 
 
-    <!-- ====================================================
-         SEARCH AGAIN
-    ===================================================== -->
-
-    <section class="search-card">
-
-
-        <div class="card-header">
-
-
-            <div class="badge-mini">
-
-                ✦ WANT SOMETHING ELSE?
-
-            </div>
-
-
-            <h2>
-
-                Try another search
-
-            </h2>
-
-
-            <p>
-
-                Change your requirements,
-                category or budget.
-
-            </p>
-
-
-        </div>
-
-
-        <a
-            href="/"
-            class="btn-primary search-again"
-        >
-
-            <span>
-
-                ← Search Again
-
-            </span>
-
-        </a>
-
-
-    </section>
-
-
-
-    <!-- ====================================================
+    <!-- =====================================================
          FOOTER
-    ===================================================== -->
+    ====================================================== -->
 
     <footer class="footer">
 
         <p>
-
-            ©️ 2026 ShopGenie ·
-            AI-Powered Agentic Commerce
-
+            ✦ ShopGenie · AI-Powered Agentic Commerce · 2026
         </p>
 
     </footer>
 
 
-</div>
-
-
-
-<!-- ========================================================
-     IMAGE FALLBACK JAVASCRIPT
-========================================================= -->
-
-<script>
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
-
-
-        const images =
-            document.querySelectorAll(
-                ".product-image"
-            );
-
-
-        images.forEach(function (img) {
-
-
-            let imageList = [];
-
-
-            try {
-
-                imageList =
-                    JSON.parse(
-                        img.dataset.images
-                    );
-
-            } catch (error) {
-
-                imageList = [];
-
-            }
-
-
-            let currentIndex = 0;
-
-
-            /*
-             * If an image fails:
-             * automatically try the next image.
-             */
-
-            img.addEventListener(
-                "error",
-                function () {
-
-
-                    currentIndex++;
-
-
-                    if (
-                        currentIndex <
-                        imageList.length
-                    ) {
-
-
-                        img.src =
-                            imageList[currentIndex];
-
-
-                    } else {
-
-
-                        /*
-                         * All images failed.
-                         * Show a clean placeholder.
-                         */
-
-                        const container =
-                            img.parentElement;
-
-
-                        img.remove();
-
-
-                        container.classList.add(
-                            "image-error"
-                        );
-
-
-                    }
-
-                }
-            );
-
-
-        });
-
-    }
-
-);
-
-</script>
-
-
 </body>
-
 </html>

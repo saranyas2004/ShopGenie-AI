@@ -28,19 +28,18 @@ if not SERPER_API_KEY:
 
 
 # ============================================================
-# GEMINI
+# GEMINI SETUP
 # ============================================================
 
 client = genai.Client(
     api_key=GEMINI_API_KEY
 )
 
-# This is the model that worked in your test
 MODEL = "gemini-3.5-flash"
 
 
 # ============================================================
-# SEARCH PRODUCT IMAGES
+# SEARCH PRODUCT IMAGES USING SERPER
 # ============================================================
 
 def get_product_images(product_name):
@@ -52,14 +51,8 @@ def get_product_images(product_name):
         "Content-Type": "application/json"
     }
 
-    # Search specifically for the exact product
-    search_query = (
-        f'"{product_name}" '
-        f'official product laptop'
-    )
-
     payload = {
-        "q": search_query,
+        "q": f'"{product_name}" official product',
         "num": 10
     }
 
@@ -78,15 +71,9 @@ def get_product_images(product_name):
 
         images = data.get("images", [])
 
-        if not images:
-            print(
-                "No images found for:",
-                product_name
-            )
-            return []
+        image_urls = []
 
-
-        # Words that usually indicate unrelated images
+        # Avoid irrelevant images
         bad_words = [
             "cat",
             "kitten",
@@ -101,10 +88,6 @@ def get_product_images(product_name):
             "person",
             "people"
         ]
-
-
-        image_urls = []
-
 
         for image in images:
 
@@ -128,51 +111,36 @@ def get_product_images(product_name):
                 ""
             ).lower()
 
+            combined_text = title + " " + source
 
-            # Skip obvious unrelated results
-            combined_text = (
-                title + " " + source
-            )
-
+            # Skip irrelevant images
             if any(
                 word in combined_text
                 for word in bad_words
             ):
                 continue
 
-
-            # Prefer full image URL
+            # Add main image
             if image_url:
 
                 if image_url not in image_urls:
+                    image_urls.append(image_url)
 
-                    image_urls.append(
-                        image_url
-                    )
-
-
-            # Also collect thumbnail as fallback
+            # Add thumbnail
             if thumbnail_url:
 
                 if thumbnail_url not in image_urls:
+                    image_urls.append(thumbnail_url)
 
-                    image_urls.append(
-                        thumbnail_url
-                    )
-
-
-            # We only need a few fallbacks
+            # Maximum 6 images
             if len(image_urls) >= 6:
                 break
 
-
         print(
-            f"Found {len(image_urls)} image candidates "
-            f"for {product_name}"
+            f"Found {len(image_urls)} images for {product_name}"
         )
 
         return image_urls
-
 
     except Exception as e:
 
@@ -185,7 +153,7 @@ def get_product_images(product_name):
 
 
 # ============================================================
-# SEARCH PRODUCT LINK
+# SEARCH PRODUCT LINK USING SERPER
 # ============================================================
 
 def get_product_link(product_name):
@@ -202,7 +170,7 @@ def get_product_link(product_name):
         "num": 10
     }
 
-
+    # Preferred shopping / official websites
     preferred_domains = [
         "amazon.in",
         "flipkart.com",
@@ -212,9 +180,12 @@ def get_product_link(product_name):
         "lenovo.com",
         "hp.com",
         "acer.com",
-        "asus.com"
+        "asus.com",
+        "dell.com",
+        "samsung.com",
+        "boat-lifestyle.com",
+        "jbl.com"
     ]
-
 
     try:
 
@@ -234,9 +205,9 @@ def get_product_link(product_name):
             []
         )
 
-
-        # First preference:
-        # shopping sites and official brands
+        # ----------------------------------------------------
+        # Prefer shopping websites
+        # ----------------------------------------------------
 
         for result in results:
 
@@ -248,21 +219,21 @@ def get_product_link(product_name):
             if not link:
                 continue
 
-
             for domain in preferred_domains:
 
                 if domain in link.lower():
 
                     return link
 
+        # ----------------------------------------------------
+        # Fallback to first Google result
+        # ----------------------------------------------------
 
-        # Fallback
         if results:
 
             return results[0].get(
                 "link"
             )
-
 
     except Exception as e:
 
@@ -271,12 +242,11 @@ def get_product_link(product_name):
             e
         )
 
-
     return None
 
 
 # ============================================================
-# GENERATE GEMINI RECOMMENDATIONS
+# GENERATE AI RECOMMENDATIONS
 # ============================================================
 
 def generate_recommendations(
@@ -286,8 +256,7 @@ def generate_recommendations(
 ):
 
     ai_prompt = f"""
-You are ShopGenie, an intelligent AI shopping
-recommendation agent.
+You are ShopGenie, an AI shopping recommendation assistant.
 
 USER REQUIREMENT:
 {prompt}
@@ -298,21 +267,22 @@ CATEGORY:
 MAXIMUM BUDGET:
 ₹{budget}
 
-Recommend exactly 3 realistic products.
+Recommend exactly 3 REAL products.
 
 IMPORTANT RULES:
 
-1. Recommend REAL products that actually exist.
-2. Respect the user's maximum budget.
-3. Consider the user's requirements carefully.
+1. Products must actually exist.
+2. Give specific product model names.
+3. Respect the user's maximum budget.
 4. Prefer products available in India.
-5. Do not invent unrealistic product models.
-6. Give specific product names.
+5. Do not invent product names.
+6. Do not recommend unrelated products.
 7. Return exactly 3 products.
 8. Match score must be between 0 and 100.
 9. Keep descriptions short.
 10. Keep the reason short.
-11. If the category is laptops, recommend REAL laptop models.
+11. Use realistic Indian prices.
+12. The product should match the user's category and requirements.
 
 Return ONLY valid JSON.
 
@@ -320,60 +290,55 @@ Do not use markdown.
 Do not use ```json.
 Do not add explanations outside the JSON.
 
-Use exactly this structure:
+Use this exact structure:
 
 {{
     "recommendations": [
         {{
-            "name": "Exact real product name",
-            "price": "₹60,990",
-            "description": "Short product description.",
-            "why": "Why this product matches.",
-            "match_score": 95
-        }},
-        {{
-            "name": "Exact real product name",
-            "price": "₹65,990",
-            "description": "Short product description.",
-            "why": "Why this product matches.",
-            "match_score": 92
-        }},
-        {{
-            "name": "Exact real product name",
+            "name": "Real product model",
             "price": "₹59,990",
-            "description": "Short product description.",
-            "why": "Why this product matches.",
-            "match_score": 88
+            "description": "Short product description",
+            "why": "Why ShopGenie recommends this product",
+            "match": 95
+        }},
+        {{
+            "name": "Real product model",
+            "price": "₹61,990",
+            "description": "Short product description",
+            "why": "Why ShopGenie recommends this product",
+            "match": 92
+        }},
+        {{
+            "name": "Real product model",
+            "price": "₹54,990",
+            "description": "Short product description",
+            "why": "Why ShopGenie recommends this product",
+            "match": 89
         }}
     ]
 }}
 """
 
-
-    # ========================================================
-    # GEMINI RETRY
-    # ========================================================
-
+    # Try Gemini up to 3 times
     for attempt in range(3):
 
         try:
 
             print(
-                f"Calling Gemini... "
-                f"attempt {attempt + 1}"
+                f"Calling Gemini... attempt {attempt + 1}"
             )
-
 
             response = client.models.generate_content(
                 model=MODEL,
                 contents=ai_prompt
             )
 
-
             text = response.text.strip()
 
+            # ------------------------------------------------
+            # Remove Markdown code fences if Gemini adds them
+            # ------------------------------------------------
 
-            # Remove markdown if Gemini adds it
             if text.startswith("```"):
 
                 text = (
@@ -383,39 +348,39 @@ Use exactly this structure:
                     .strip()
                 )
 
+            # ------------------------------------------------
+            # Convert JSON text into Python dictionary
+            # ------------------------------------------------
 
             data = json.loads(text)
-
 
             recommendations = data.get(
                 "recommendations",
                 []
             )
 
+            # ------------------------------------------------
+            # Make sure we received 3 products
+            # ------------------------------------------------
 
             if len(recommendations) >= 3:
 
                 return recommendations[:3]
 
-
             raise ValueError(
                 "Gemini did not return 3 products."
             )
 
-
         except Exception as e:
 
             print(
-                f"Gemini attempt "
-                f"{attempt + 1} failed:",
+                f"Gemini attempt {attempt + 1} failed:",
                 e
             )
-
 
             if attempt < 2:
 
                 time.sleep(3)
-
 
     raise Exception(
         "Gemini could not generate recommendations."
@@ -423,7 +388,7 @@ Use exactly this structure:
 
 
 # ============================================================
-# HOME
+# HOME PAGE
 # ============================================================
 
 @app.route("/")
@@ -435,7 +400,7 @@ def home():
 
 
 # ============================================================
-# RECOMMEND
+# RECOMMENDATION PAGE
 # ============================================================
 
 @app.route(
@@ -444,17 +409,19 @@ def home():
 )
 def recommend():
 
+    # --------------------------------------------------------
+    # Get form values
+    # --------------------------------------------------------
+
     prompt = request.form.get(
         "prompt",
         ""
     ).strip()
 
-
     category = request.form.get(
         "category",
         "any"
     ).strip()
-
 
     budget = request.form.get(
         "budget",
@@ -462,9 +429,9 @@ def recommend():
     ).strip()
 
 
-    # ========================================================
-    # VALIDATION
-    # ========================================================
+    # --------------------------------------------------------
+    # Validate prompt
+    # --------------------------------------------------------
 
     if not prompt:
 
@@ -474,28 +441,41 @@ def recommend():
             prompt="",
             category=category,
             budget=budget,
-            error=(
-                "Please describe what "
-                "you are looking for."
-            )
+            error="Please describe what you are looking for."
         )
 
 
-    # ========================================================
-    # GENERATE PRODUCTS
-    # ========================================================
+    # --------------------------------------------------------
+    # Validate budget
+    # --------------------------------------------------------
+
+    if not budget:
+
+        budget = "70000"
+
+
+    # Remove commas from budget
+    clean_budget = budget.replace(
+        ",",
+        ""
+    )
+
+
+    # --------------------------------------------------------
+    # Generate recommendations
+    # --------------------------------------------------------
 
     try:
 
         products = generate_recommendations(
             prompt,
             category,
-            budget
+            clean_budget
         )
 
 
         # ====================================================
-        # IMAGES + PRODUCT LINKS
+        # GET IMAGES AND PRODUCT LINKS
         # ====================================================
 
         for product in products:
@@ -505,58 +485,102 @@ def recommend():
                 ""
             ).strip()
 
-
-            if product_name:
-
-                print(
-                    "\nSearching images for:",
-                    product_name
-                )
+            print(
+                "\nProcessing:",
+                product_name
+            )
 
 
-                # Multiple image candidates
-                product["image_urls"] = (
-                    get_product_images(
-                        product_name
-                    )
-                )
+            # ------------------------------------------------
+            # IMAGE SEARCH
+            # ------------------------------------------------
 
+            image_urls = get_product_images(
+                product_name
+            )
 
-                # First image
-                if product["image_urls"]:
+            if image_urls:
 
-                    product["image_url"] = (
-                        product["image_urls"][0]
-                    )
+                product["image"] = image_urls[0]
 
-                else:
-
-                    product["image_url"] = None
-
-
-                # Product link
-                print(
-                    "Searching product link for:",
-                    product_name
-                )
-
-
-                product["product_url"] = (
-                    get_product_link(
-                        product_name
-                    )
-                )
-
+                # Store all images
+                product["image_urls"] = image_urls
 
             else:
 
+                product["image"] = None
+
                 product["image_urls"] = []
-                product["image_url"] = None
-                product["product_url"] = None
+
+
+            # ------------------------------------------------
+            # PRODUCT LINK
+            # ------------------------------------------------
+
+            product["url"] = get_product_link(
+                product_name
+            )
+
+
+            # ------------------------------------------------
+            # FALLBACK PRODUCT LINK
+            # ------------------------------------------------
+
+            if not product["url"]:
+
+                product["url"] = (
+                    "https://www.google.com/search?q="
+                    + requests.utils.quote(
+                        product_name + " buy India"
+                    )
+                )
+
+
+            # ------------------------------------------------
+            # MATCH SCORE
+            # ------------------------------------------------
+
+            if "match" not in product:
+
+                if "match_score" in product:
+
+                    product["match"] = product[
+                        "match_score"
+                    ]
+
+                else:
+
+                    product["match"] = 0
+
+
+            # ------------------------------------------------
+            # Make sure match is a valid number
+            # ------------------------------------------------
+
+            try:
+
+                product["match"] = int(
+                    product["match"]
+                )
+
+            except:
+
+                product["match"] = 0
+
+
+            # Keep match between 0 and 100
+
+            product["match"] = max(
+                0,
+                min(
+                    100,
+                    product["match"]
+                )
+            )
 
 
         # ====================================================
-        # RESULTS PAGE
+        # DISPLAY RESULTS
         # ====================================================
 
         return render_template(
@@ -569,13 +593,16 @@ def recommend():
         )
 
 
+    # ========================================================
+    # ERROR HANDLING
+    # ========================================================
+
     except Exception as e:
 
         print(
             "\nShopGenie Error:",
             e
         )
-
 
         return render_template(
             "results.html",
@@ -591,7 +618,7 @@ def recommend():
 
 
 # ============================================================
-# RUN
+# RUN APPLICATION
 # ============================================================
 
 if __name__ == "__main__":
