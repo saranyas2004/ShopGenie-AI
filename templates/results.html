@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        ShopGenie | Your Recommendations
+    </title>
+
+
+    <!-- Google Font -->
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- CSS -->
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="ambient-glow"></div>
+
+
+<div class="container">
+
+
+    <!-- ====================================================
+         NAVBAR
+    ===================================================== -->
+
+    <header class="navbar">
+
+
+        <a
+            href="/"
+            class="logo"
+        >
+
+            <span class="logo-icon">
+                ✦
+            </span>
+
+            <span class="logo-text">
+                ShopGenie
+            </span>
+
+        </a>
+
+
+        <div class="status-badge">
+
+            <span class="pulse-dot"></span>
+
+            AI Assistant Online
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- ====================================================
+         HERO
+    ===================================================== -->
+
+    <section class="hero results-hero">
+
+
+        <div class="pill-badge">
+
+            ✨ AI RECOMMENDATIONS
+
+        </div>
+
+
+        <h1 class="hero-title">
+
+            Your
+            <span>Best Matches</span>
+
+        </h1>
+
+
+        <p class="hero-subtitle">
+
+            ShopGenie analyzed your requirements
+            and selected products that best match
+            your needs and budget.
+
+        </p>
+
+
+    </section>
+
+
+
+    <!-- ====================================================
+         SEARCH SUMMARY
+    ===================================================== -->
+
+    <section class="search-card">
+
+
+        <div class="card-header">
+
+
+            <div class="badge-mini">
+
+                ✦ YOUR SEARCH
+
+            </div>
+
+
+            <h2>
+
+                Your Requirements
+
+            </h2>
+
+
+            <p>
+
+                {{ prompt }}
+
+            </p>
+
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+            <div class="feature-chip">
+
+                📦 Category:
+
+                <strong>
+
+                    {{ category }}
+
+                </strong>
+
+            </div>
+
+
+            <div class="feature-chip">
+
+                💰 Budget:
+
+                <strong>
+
+                    ₹{{ budget }}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <!-- ====================================================
+         RECOMMENDATIONS
+    ===================================================== -->
+
+    <section class="steps-section">
+
+
+        <div class="section-title">
+
+
+            <div class="pill-badge">
+
+                TOP MATCHES
+
+            </div>
+
+
+            <h2>
+
+                Products selected for you
+
+            </h2>
+
+
+        </div>
+
+
+
+        {% if error %}
+
+
+        <!-- ERROR -->
+
+        <div class="step-card error-card">
+
+
+            <div class="step-header">
+
+                <span class="step-emoji">
+
+                    ⚠️
+
+                </span>
+
+            </div>
+
+
+            <h3>
+
+                Unable to generate recommendations
+
+            </h3>
+
+
+            <p>
+
+                {{ error }}
+
+            </p>
+
+
+        </div>
+
+
+        {% else %}
+
+
+
+        <!-- =================================================
+             PRODUCT GRID
+        ================================================== -->
+
+        <div class="steps-grid">
+
+
+            {% for product in products %}
+
+
+            <div class="step-card product-card">
+
+
+                <!-- ==========================================
+                     PRODUCT IMAGE
+                =========================================== -->
+
+
+                <div class="product-image-container">
+
+
+                    {% if product.image_urls %}
+
+
+                    <img
+                        src="{{ product.image_urls[0] }}"
+                        alt="{{ product.name }}"
+                        class="product-image"
+                        loading="eager"
+                        data-images='{{ product.image_urls | tojson }}'
+                        data-image-index="0"
+                    >
+
+
+                    {% else %}
+
+
+                    <div class="image-placeholder">
+
+                        <span>
+                            📦
+                        </span>
+
+                        <p>
+                            Product image unavailable
+                        </p>
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     NUMBER + ICON
+                =========================================== -->
+
+
+                <div class="step-header">
+
+
+                    <span class="step-num">
+
+                        0{{ loop.index }}
+
+                    </span>
+
+
+                    <span class="step-emoji">
+
+
+                        {% if loop.index == 1 %}
+
+                            🏆
+
+                        {% elif loop.index == 2 %}
+
+                            ⭐
+
+                        {% else %}
+
+                            🎯
+
+                        {% endif %}
+
+
+                    </span>
+
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     PRODUCT NAME
+                =========================================== -->
+
+
+                <h3>
+
+                    {{ product.name }}
+
+                </h3>
+
+
+
+                <!-- ==========================================
+                     PRICE
+                =========================================== -->
+
+
+                <div class="product-price">
+
+                    {{ product.price }}
+
+                </div>
+
+
+
+                <!-- ==========================================
+                     DESCRIPTION
+                =========================================== -->
+
+
+                <p>
+
+                    {{ product.description }}
+
+                </p>
+
+
+
+                <!-- ==========================================
+                     MATCH SCORE
+                =========================================== -->
+
+
+                {% if product.match_score %}
+
+
+                <div class="match-score">
+
+
+                    <strong>
+
+                        {{ product.match_score }}% Match
+
+                    </strong>
+
+
+                    <div class="score-bar">
+
+
+                        <div
+                            class="score-fill"
+                            style="width: {{ product.match_score }}%;"
+                        >
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+                {% endif %}
+
+
+
+                <!-- ==========================================
+                     WHY
+                =========================================== -->
+
+
+                {% if product.why %}
+
+
+                <div class="why-box">
+
+
+                    <strong>
+
+                        🤖 Why ShopGenie recommends this
+
+                    </strong>
+
+
+                    <p>
+
+                        {{ product.why }}
+
+                    </p>
+
+
+                </div>
+
+
+                {% endif %}
+
+
+
+                <!-- ==========================================
+                     PRODUCT LINK
+                =========================================== -->
+
+
+                {% if product.product_url %}
+
+
+                <a
+                    href="{{ product.product_url }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="view-product-btn"
+                >
+
+                    View Product →
+
+                </a>
+
+
+                {% endif %}
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        </div>
+
+
+        {% endif %}
+
+
+    </section>
+
+
+
+    <!-- ====================================================
+         SEARCH AGAIN
+    ===================================================== -->
+
+    <section class="search-card">
+
+
+        <div class="card-header">
+
+
+            <div class="badge-mini">
+
+                ✦ WANT SOMETHING ELSE?
+
+            </div>
+
+
+            <h2>
+
+                Try another search
+
+            </h2>
+
+
+            <p>
+
+                Change your requirements,
+                category or budget.
+
+            </p>
+
+
+        </div>
+
+
+        <a
+            href="/"
+            class="btn-primary search-again"
+        >
+
+            <span>
+
+                ← Search Again
+
+            </span>
+
+        </a>
+
+
+    </section>
+
+
+
+    <!-- ====================================================
+         FOOTER
+    ===================================================== -->
+
+    <footer class="footer">
+
+        <p>
+
+            ©️ 2026 ShopGenie ·
+            AI-Powered Agentic Commerce
+
+        </p>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- ========================================================
+     IMAGE FALLBACK JAVASCRIPT
+========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+        const images =
+            document.querySelectorAll(
+                ".product-image"
+            );
+
+
+        images.forEach(function (img) {
+
+
+            let imageList = [];
+
+
+            try {
+
+                imageList =
+                    JSON.parse(
+                        img.dataset.images
+                    );
+
+            } catch (error) {
+
+                imageList = [];
+
+            }
+
+
+            let currentIndex = 0;
+
+
+            /*
+             * If an image fails:
+             * automatically try the next image.
+             */
+
+            img.addEventListener(
+                "error",
+                function () {
+
+
+                    currentIndex++;
+
+
+                    if (
+                        currentIndex <
+                        imageList.length
+                    ) {
+
+
+                        img.src =
+                            imageList[currentIndex];
+
+
+                    } else {
+
+
+                        /*
+                         * All images failed.
+                         * Show a clean placeholder.
+                         */
+
+                        const container =
+                            img.parentElement;
+
+
+                        img.remove();
+
+
+                        container.classList.add(
+                            "image-error"
+                        );
+
+
+                    }
+
+                }
+            );
+
+
+        });
+
+    }
+
+);
+
+</script>
+
+
+</body>
+
+</html>

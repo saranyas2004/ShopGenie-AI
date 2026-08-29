@@ -58,15 +58,16 @@
         <p>Describe your ideal product in your own words.</p>
       </div>
 
-      <form id="shopForm">
+      <form id="shopForm" action="/recommend" method="POST">
         <div class="form-group">
           <label for="prompt">Describe Your Need</label>
           <div class="input-wrapper">
             <textarea 
-              id="prompt" 
-              rows="3" 
-              placeholder="Example: I need a lightweight laptop for coding with at least 16GB RAM and great battery life..."
-            ></textarea>
+    id="prompt"
+    name="prompt"
+    rows="3"
+    placeholder="Example: I need a lightweight laptop for coding with at least 16GB RAM and great battery life..."
+></textarea>
           </div>
           <span class="input-tip">💡 <strong>Tip:</strong> Include your budget, use case, and important features.</span>
         </div>
@@ -75,7 +76,7 @@
           <div class="form-group">
             <label for="category">Category</label>
             <div class="select-wrapper">
-              <select id="category">
+              <select id="category" name="category">
                 <option value="any">📦 Any Category</option>
                 <option value="laptops">💻 Laptops & Computers</option>
                 <option value="smartphones">📱 Smartphones</option>
@@ -89,12 +90,18 @@
             <label for="budget">Maximum Budget</label>
             <div class="currency-input">
               <span class="currency-symbol">₹</span>
-              <input type="text" id="budget" value="70,000" placeholder="e.g. 50,000" />
+              <input
+    type="text"
+    id="budget"
+    name="budget"
+    value="70,000"
+    placeholder="e.g. 50,000"
+/>
             </div>
           </div>
         </div>
 
-        <button type="button" class="btn-primary">
+        <button type="submit" class="btn-primary">
           <span>Find My Best Match</span>
           <span class="arrow">→</span>
         </button>
